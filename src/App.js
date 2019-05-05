@@ -1,26 +1,117 @@
 import React from 'react';
-import logo from './logo.svg';
+import {Card, ListGroup, Row, Col} from 'react-bootstrap'
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+let API = 'https://api.github.com/search/repositories?q=';
+
+let initialState = {
+    keyword: '',
+    repos: []
+};
+
+class App extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            keyword: '',
+            repos: []
+        };
+        this.handleChange = this.handleChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
+    fetchProfile(keyword) {
+        console.log(keyword);
+        let url = `${API}/${keyword}`;
+        fetch(url)
+            .then((res) => res.json())
+            .then((data) => {
+                this.setState(initialState);
+                for (let i = 0; i < data.items.length; i++) {
+                    // console.log(data.items[i]);
+                    /*this.setState({
+                        repos: this.state.repos.concat({
+                            name: data.items[i].name,
+                            avatar: data.items[i].owner.avatar_url,
+                            description: data.items[i].description,
+                            forks: data.items[i].forks,
+                            open_issues: data.items[i].open_issues,
+                            link: data.items[i].html_url
+                        })
+                    });*/
+
+                    this.setState(prevState => ({
+                        repos: [...prevState.repos, {
+                            name: data.items[i].name,
+                            avatar: data.items[i].owner.avatar_url,
+                            description: data.items[i].description,
+                            forks: data.items[i].forks,
+                            open_issues: data.items[i].open_issues,
+                            link: data.items[i].html_url
+                        }]
+                    }))
+                }
+            })
+            .catch((error) => console.log('Oops! . There Is A Problem'))
+    }
+
+    handleChange(event) {
+        this.setState({keyword: event.target.value});
+    }
+
+    handleSubmit(event) {
+        console.log(this.state.keyword);
+        event.preventDefault();
+        this.fetchProfile(encodeURIComponent(this.state.keyword));
+    }
+
+    render() {
+
+        return (
+            <div className={"text-center"} style={{margin: "0 auto"}}>
+                <form style={{margin: "15px"}} onSubmit={this.handleSubmit}>
+                    <label>
+                        <input type="text" value={this.state.value} onChange={this.handleChange}/>
+                    </label>
+                    <input type="submit" value="Search Repositories"/>
+
+                    {/*<InputGroup className="mb-3">
+                        <FormControl
+                            placeholder="Search Github Repository"
+                            aria-label="Keyword"
+                            aria-describedby="basic-addon2"
+                            onChange={this.handleChange}
+                        />
+                        <InputGroup.Append>
+                            <Button variant="outline-secondary">Search</Button>
+                        </InputGroup.Append>
+                    </InputGroup>*/}
+                </form>
+                <Row>
+                    {this.state.repos.map(item => (
+                        <Col md={3} style={{marginTop: "10px"}}>
+                            <Card>
+                                <Card.Img variant="top" src={item.avatar}/>
+                                <Card.Body>
+                                    <Card.Title>{item.name}</Card.Title>
+                                    <Card.Text>
+                                        {item.description}
+                                    </Card.Text>
+                                    <ListGroup variant="flush">
+                                        <ListGroup.Item>Open Issues: {item.open_issues}</ListGroup.Item>
+                                        <ListGroup.Item>Forks: {item.forks}</ListGroup.Item>
+                                    </ListGroup>
+                                    <Card.Footer className="text-muted">
+                                        <a href={item.link}>Go to repository</a>
+                                    </Card.Footer>
+                                </Card.Body>
+                            </Card>
+                        </Col>
+                    ))}
+                </Row>
+            </div>
+        );
+    }
 }
 
 export default App;
