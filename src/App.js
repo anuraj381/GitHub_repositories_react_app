@@ -20,26 +20,15 @@ class App extends React.Component {
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
+    //function to fetch the repositories
     fetchProfile(keyword) {
-        console.log(keyword);
         let url = `${API}/${keyword}`;
         fetch(url)
             .then((res) => res.json())
             .then((data) => {
                 this.setState(initialState);
                 for (let i = 0; i < data.items.length; i++) {
-                    // console.log(data.items[i]);
-                    /*this.setState({
-                        repos: this.state.repos.concat({
-                            name: data.items[i].name,
-                            avatar: data.items[i].owner.avatar_url,
-                            description: data.items[i].description,
-                            forks: data.items[i].forks,
-                            open_issues: data.items[i].open_issues,
-                            link: data.items[i].html_url
-                        })
-                    });*/
-
+                    //After fetching repos, notify state about the change
                     this.setState(prevState => ({
                         repos: [...prevState.repos, {
                             name: data.items[i].name,
@@ -59,6 +48,7 @@ class App extends React.Component {
         this.setState({keyword: event.target.value});
     }
 
+    //submitting the keyword searched to get repositories
     handleSubmit(event) {
         console.log(this.state.keyword);
         event.preventDefault();
@@ -66,7 +56,6 @@ class App extends React.Component {
     }
 
     render() {
-
         return (
             <div className={"text-center"} style={{margin: "0 auto"}}>
                 <form style={{margin: "15px"}} onSubmit={this.handleSubmit}>
@@ -74,18 +63,6 @@ class App extends React.Component {
                         <input type="text" value={this.state.value} onChange={this.handleChange}/>
                     </label>
                     <input type="submit" value="Search Repositories"/>
-
-                    {/*<InputGroup className="mb-3">
-                        <FormControl
-                            placeholder="Search Github Repository"
-                            aria-label="Keyword"
-                            aria-describedby="basic-addon2"
-                            onChange={this.handleChange}
-                        />
-                        <InputGroup.Append>
-                            <Button variant="outline-secondary">Search</Button>
-                        </InputGroup.Append>
-                    </InputGroup>*/}
                 </form>
                 <Row>
                     {this.state.repos.map(item => (
