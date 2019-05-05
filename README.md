@@ -1,3 +1,6 @@
+This is a test React App to fetch Github repository details. Developed by Anuraj jain 
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
